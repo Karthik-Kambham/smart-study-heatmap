@@ -158,7 +158,7 @@ elif menu=="🔥 Heatmap":
             cur_date+=timedelta(days=1)
         if any(cur_week): weeks.append(cur_week)
         days=["Mon","Tue","Wed","Thu","Fri","Sat"]
-        html=f'<div style="background:#0f172a; border:1px solid #1f2c42; padding:16px; border-radius:16px; margin-top:12px;"><div style="display:flex; justify-content:space-between; margin-bottom:12px;"><div style="color:white; font-weight:700; font-size:14px;">2026 Activity Overview</div><div style="display:flex; gap:6px; align-items:center;"><span style="color:#64748b; font-size:11px;">Less</span><div style="width:12px; height:12px; background:#1e293b; border-radius:3px;"></div><div style="width:12px; height:12px; background:#006d32; border-radius:3px;"></div><div style="width:12px; height:12px; background:#39d353; border-radius:3px;"></div><span style="color:#64748b; font-size:11px;">More</span></div></div><div style="display:flex; gap:6px;"><div style="display:flex; flex-direction:column; gap:5px;">'
+        html=f'<div style="background:#0f172a; border:1px solid #1f2c42; padding:16px; border-radius:16px; margin-top:16px;"><div style="display:flex; justify-content:space-between; margin-bottom:12px;"><div style="color:white; font-weight:700; font-size:14px;">2026 Activity Overview</div><div style="display:flex; gap:6px; align-items:center;"><span style="color:#64748b; font-size:11px;">Less</span><div style="width:12px; height:12px; background:#1e293b; border-radius:3px;"></div><div style="width:12px; height:12px; background:#006d32; border-radius:3px;"></div><div style="width:12px; height:12px; background:#39d353; border-radius:3px;"></div><span style="color:#64748b; font-size:11px;">More</span></div></div><div style="display:flex; gap:6px;"><div style="display:flex; flex-direction:column; gap:5px;">'
         for d in days: html+=f'<div style="width:30px; height:14px; color:#64748b; font-size:11px;">{d}</div>'
         html+='</div><div style="display:flex; gap:4px; overflow-x:auto;">'
         for week in weeks:
@@ -179,27 +179,26 @@ elif menu=="🔥 Heatmap":
         html+='</div></div></div>'
         st.markdown(html, unsafe_allow_html=True)
 
-        # --- FIXED GAP HERE ---
-        st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:32px;'></div>", unsafe_allow_html=True)
 
-        st.markdown('<div style="background:#141b2d; border:1px solid #1f2c42; border-radius:18px; padding:12px 18px 2px 18px;">', unsafe_allow_html=True)
+        st.markdown('<div style="background:#141b2d; border:1px solid #1f2c42; border-radius:18px; padding:16px 18px 8px 18px;">', unsafe_allow_html=True)
         heat = df.groupby(df["study_date"].dt.date)["duration"].sum().sort_index().tail(20)
         plt.style.use("dark_background")
-        fig, ax = plt.subplots(figsize=(9,2.8))
+        fig, ax = plt.subplots(figsize=(9,3.2))
         fig.patch.set_facecolor("#141b2d"); ax.set_facecolor("#141b2d")
         bars = ax.bar([d.strftime("%b %d") for d in pd.to_datetime(heat.index)], heat.values, color="#3b82f6", width=0.6, edgecolor="#1f2c42")
         max_v = max(heat.values) if len(heat)>0 else 1
-        ax.set_ylim(0, max_v*1.4 if max_v>=1 else max_v*2+0.5)
+        ax.set_ylim(0, max_v*1.6 if max_v>=1 else max_v*3+0.5)
         for bar in bars:
             h=bar.get_height()
             if h>0.001:
-                gap = max_v*0.05 if max_v>=1 else 0.08
+                gap = max_v*0.08 if max_v>=1 else 0.1
                 ax.text(bar.get_x()+bar.get_width()/2., h+gap, f'{h:.1f}h', ha='center', va='bottom', color='white', fontsize=9, fontweight='bold')
         ax.set_ylabel("Hours", color="white")
         ax.tick_params(colors="white", rotation=25, labelsize=9)
         ax.grid(axis='y', alpha=0.15)
         for spine in ax.spines.values(): spine.set_color("#1f2c42")
-        fig.tight_layout(pad=0.5)
+        fig.tight_layout()
         st.pyplot(fig, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
